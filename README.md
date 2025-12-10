@@ -1,98 +1,160 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Python Garbage Collection Visualizer
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Interactive web application to visualize and understand Python's garbage collection mechanism.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+![Python GC Visualizer](https://img.shields.io/badge/Python-GC%20Visualizer-blue)
+![NestJS](https://img.shields.io/badge/NestJS-Backend-red)
+![React](https://img.shields.io/badge/React-Frontend-61dafb)
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
+## Quick Start
 
 ```bash
-$ pnpm install
+# Install dependencies
+pnpm install
+
+# Build the application
+pnpm run build
+
+# Start the application
+pnpm run start
 ```
 
-## Compile and run the project
+Visit [http://localhost:3000](http://localhost:3000) to use the visualizer.
+
+## Development Mode
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+# Run both frontend and backend in development mode
+pnpm run dev
 ```
 
-## Run tests
+This will start:
+- Backend server at [http://localhost:3000](http://localhost:3000)
+- Frontend dev server at [http://localhost:5173](http://localhost:5173) (with API proxy)
 
-```bash
-# unit tests
-$ pnpm run test
+## Features
 
-# e2e tests
-$ pnpm run test:e2e
+### Interactive Visualization
+- **D3.js Force Graph**: Visualize objects and their references in real-time
+- **Color-Coded Objects**:
+  - Blue: Normal objects
+  - Red: Root objects (protected from GC)
+  - Green: Marked (reachable) objects
+  - Gray: Collected objects
 
-# test coverage
-$ pnpm run test:cov
+### Python GC Mechanisms
+
+#### 1. Reference Counting
+- Create objects and references to see reference counts in action
+- Remove references to trigger immediate collection
+- Mark objects as roots to protect them from collection
+
+#### 2. Generational GC
+- Three generations (0: Young, 1: Middle, 2: Old)
+- New objects start in generation 0
+- Surviving objects are promoted to higher generations
+- Trigger collection for specific generations
+
+### Interactive Controls
+- **Create Objects**: Add Python objects (dict, list, tuple, set, object, function)
+- **Manage References**: Create and remove references between objects
+- **Set Roots**: Mark objects as GC roots
+- **Trigger GC**: Run garbage collection for any generation
+- **View Steps**: See detailed timeline of GC operations
+
+### Statistics Dashboard
+- Total objects count
+- Alive vs collected objects
+- Number of GC collections
+- Generation statistics
+
+## How Python GC Works
+
+### Reference Counting
+Every Python object maintains a reference count. When the count reaches zero (and the object is not a root), it's immediately collected.
+
+### Mark-and-Sweep (Generational)
+Python uses a generational garbage collector to detect and collect cyclic references:
+
+1. **Mark Phase**: Starting from root objects, mark all reachable objects
+2. **Sweep Phase**: Collect all unmarked objects
+3. **Generation Promotion**: Surviving objects move to the next generation
+
+## Project Structure
+
+```
+hands-on-py-gc/
+├── src/                          # Backend (NestJS)
+│   ├── gc/                       # GC module
+│   │   ├── models/              # PyObject, GCState models
+│   │   ├── dto/                 # API DTOs
+│   │   ├── gc.service.ts        # GC algorithm implementation
+│   │   ├── gc.controller.ts     # REST API endpoints
+│   │   └── gc.module.ts
+│   └── app.module.ts
+├── client/                       # Frontend (React + D3.js)
+│   ├── src/
+│   │   ├── components/          # React components
+│   │   │   ├── GCVisualization.tsx
+│   │   │   ├── ControlPanel.tsx
+│   │   │   ├── StepTimeline.tsx
+│   │   │   └── StatsPanel.tsx
+│   │   ├── services/            # API client
+│   │   └── App.tsx
+│   └── index.html
+└── README.md
 ```
 
-## Deployment
+## API Endpoints
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- `GET /api/gc/state` - Get current GC state
+- `POST /api/gc/reset` - Reset the GC state
+- `POST /api/gc/objects` - Create a new object
+- `POST /api/gc/references` - Create a reference
+- `DELETE /api/gc/references` - Remove a reference
+- `POST /api/gc/roots` - Set/unset root object
+- `POST /api/gc/collect` - Trigger garbage collection
+- `GET /api/gc/steps` - Get all GC steps
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Technologies
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+- **Backend**: NestJS, TypeScript
+- **Frontend**: React, TypeScript, D3.js
+- **Build**: Vite (frontend), NestJS CLI (backend)
+- **Package Manager**: pnpm
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Usage Example
 
-## Resources
+1. **Create some objects**:
+   - Create "list_a" (type: list)
+   - Create "dict_b" (type: dict)
+   - Create "obj_c" (type: object)
 
-Check out a few resources that may come in handy when working with NestJS:
+2. **Add references**:
+   - list_a → dict_b
+   - dict_b → obj_c
+   - obj_c → list_a (creates a cycle!)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+3. **Set a root**:
+   - Mark list_a as a root object
 
-## Support
+4. **Trigger GC**:
+   - Click "Trigger GC" for generation 0
+   - Watch the mark-and-sweep process in the timeline
+   - See that all objects survive because list_a is a root
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+5. **Remove root and trigger again**:
+   - Unmark list_a as root
+   - Trigger GC again
+   - All three objects will be collected (cyclic garbage)
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+UNLICENSED
+
+## Learn More
+
+This visualizer demonstrates core concepts from Python's CPython implementation:
+- [PEP 442 - Safe object finalization](https://www.python.org/dev/peps/pep-0442/)
+- [CPython gc module documentation](https://docs.python.org/3/library/gc.html)
+- [Python Memory Management](https://docs.python.org/3/c-api/memory.html)
